@@ -8,7 +8,7 @@ Enhanced GPU and system monitoring tool - now with CPU and RAM monitoring!
 
 ![Screenshot: gpustat+ -s](screenshots/output.png)
 
-**gpustat+** is an enhanced version of the popular gpustat tool that not only monitors NVIDIA GPUs but also provides system-wide CPU and memory monitoring in the same unified interface.
+**gpustat+** is an enhanced version of the popular [gpustat][gpustat] tool that not only monitors NVIDIA GPUs but also provides system-wide CPU and memory monitoring in the same unified interface.
 
 ## ✨ New Features in gpustat+
 
