@@ -28,30 +28,43 @@ To do so, just use the `--exec` option to run `gpustat+` command in the web serv
 
 
 
-Quick Installation
-------------------
+Installation
+------------
 
-Install gpustat+ from [PyPI][pypi_gpustat]:
+### Ubuntu/Debian Package Installation (Recommended)
 
+For Ubuntu/Debian systems, you can install using the pre-built package:
+
+#### Prerequisites
+
+First, install the required system packages:
+
+```bash
+# Update package list
+sudo apt update
+
+# Install required packages for building and Python dependencies
+sudo apt install -y build-essential debhelper dh-python python3-all python3-setuptools python3-setuptools-scm python3-wheel devscripts 
+
+
+# Install Python dependencies
+pip3 install setuptools_scm
 ```
-pip install gpustat-plus
+
+#### Option 1: Download and Install Package
+
+```bash
+# Download the latest release package
+wget https://github.com/RobertoNeglia/gpustat-plus/releases/download/latest/gpustat-plus_*.deb
+
+# Install the package
+sudo dpkg -i gpustat-plus_*.deb
+
+# Install dependencies if needed
+sudo apt-get install -f
 ```
 
-This will install the enhanced version with both commands available:
-- `gpustat+` - The enhanced version with system monitoring
-- `gpustat` - Original command for backward compatibility
-
-If you don't have root (sudo) privilege, please try installing `gpustat+` on user namespace: `pip install --user gpustat-plus`.
-
-To install the latest version (master branch) via pip:
-
-```
-pip install git+https://github.com/RobertoNeglia/gpustat-plus.git@master
-```
-
-### Ubuntu/Debian Package Installation
-
-For Ubuntu/Debian systems, you can also install using the provided package:
+#### Option 2: Build from Source
 
 ```bash
 # Clone the repository
@@ -59,16 +72,41 @@ git clone https://github.com/RobertoNeglia/gpustat-plus.git
 cd gpustat-plus
 
 # Build the package
-./build-ubuntu-package.sh
+make package
+# or alternatively: ./build-ubuntu-package.sh
 
 # Install the package
-sudo dpkg -i ../gpustat-plus_*.deb
-
-# Install NVIDIA dependencies (if needed)
-pip3 install nvidia-ml-py
+make install
+# or alternatively: sudo dpkg -i ../gpustat-plus_*.deb
 ```
 
-See [UBUNTU-PACKAGE.md](UBUNTU-PACKAGE.md) for detailed packaging instructions.
+#### Post-Installation
+
+After installing the Ubuntu package, both commands will be available:
+- `/usr/bin/gpustat+` - Enhanced version with system monitoring
+- `/usr/bin/gpustat` - Original command for backward compatibility
+
+**Note:** The Ubuntu package automatically handles Python dependencies (psutil, blessed). The NVIDIA dependencies should already be installed from the prerequisites step above.
+
+See [UBUNTU-PACKAGE.md](UBUNTU-PACKAGE.md) for detailed packaging instructions and troubleshooting.
+
+### Direct Installation from Source
+
+If you prefer to install directly from source without building a package:
+
+```bash
+# Install the latest version directly from GitHub
+pip3 install git+https://github.com/RobertoNeglia/gpustat-plus.git@master
+
+# Or clone and install in development mode
+git clone https://github.com/RobertoNeglia/gpustat-plus.git
+cd gpustat-plus
+pip3 install -e .
+```
+
+This will install both commands:
+- `gpustat+` - Enhanced version with system monitoring
+- `gpustat` - Original command for backward compatibility
 
 
 ### NVIDIA Driver and `pynvml` Requirements
