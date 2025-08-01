@@ -1,0 +1,40 @@
+Source: gpustat-plus
+Section: utils
+Priority: optional
+Maintainer: Roberto Neglia <roberto.neglia@example.com>
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3-all,
+               python3-setuptools,
+               python3-setuptools-scm,
+               python3-wheel
+Standards-Version: 4.5.1
+Homepage: https://github.com/RobertoNeglia/gpustat-plus
+Vcs-Git: https://github.com/RobertoNeglia/gpustat-plus.git
+Vcs-Browser: https://github.com/RobertoNeglia/gpustat-plus
+
+Package: gpustat-plus
+Architecture: all
+Depends: ${misc:Depends},
+         ${python3:Depends},
+         python3-psutil (>= 5.6.0),
+         python3-blessed (>= 1.17.1),
+         python3-typing-extensions
+Recommends: python3-pynvml | python3-nvidia-ml-py (>= 12.535.108)
+Conflicts: gpustat
+Replaces: gpustat
+Provides: gpustat
+Description: Enhanced GPU and system monitoring tool
+ gpustat+ is an enhanced version of the popular gpustat tool that not only
+ monitors NVIDIA GPUs but also provides system-wide CPU and memory monitoring
+ in the same unified interface.
+ .
+ Features:
+  - System CPU monitoring: Display CPU utilization and core count
+  - System RAM monitoring: Show memory usage (used/total/percentage)
+  - Unified interface: Monitor GPUs and system resources in one command
+  - JSON support: System information included in structured output
+  - Backward compatible: All original gpustat features preserved
+ .
+ This tool works with NVIDIA Graphics Devices only. For NVIDIA GPU monitoring,
+ install nvidia-ml-py separately: pip3 install nvidia-ml-py
