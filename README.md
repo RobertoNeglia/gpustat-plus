@@ -6,7 +6,7 @@
 
 Enhanced GPU and system monitoring tool - now with CPU and RAM monitoring!
 
-![Screenshot: gpustat+ -cp](https://github.com/wookayin/gpustat/raw/master/screenshot.png)
+![Screenshot: gpustat+ -s](screenshots/output.png)
 
 **gpustat+** is an enhanced version of the popular gpustat tool that not only monitors NVIDIA GPUs but also provides system-wide CPU and memory monitoring in the same unified interface.
 
@@ -20,8 +20,10 @@ Enhanced GPU and system monitoring tool - now with CPU and RAM monitoring!
 
 NOTE: This works with NVIDIA Graphics Devices only, no AMD support as of now. Contributions are welcome!
 
-Self-Promotion: A web interface of `gpustat` is available (in alpha)! Check out [gpustat-web][gpustat-web].
+Also works in combination with [gpustat-web][gpustat-web] for web-based monitoring.
+To do so, just use the `--exec` option to run `gpustat+` command in the web server configuration instead of the original `gpustat` command. 
 
+[gpustat]: https://github.com/wookayin/gpustat
 [gpustat-web]: https://github.com/wookayin/gpustat-web
 
 
@@ -44,8 +46,29 @@ If you don't have root (sudo) privilege, please try installing `gpustat+` on use
 To install the latest version (master branch) via pip:
 
 ```
-pip install git+https://github.com/wookayin/gpustat.git@master
+pip install git+https://github.com/RobertoNeglia/gpustat-plus.git@master
 ```
+
+### Ubuntu/Debian Package Installation
+
+For Ubuntu/Debian systems, you can also install using the provided package:
+
+```bash
+# Clone the repository
+git clone https://github.com/RobertoNeglia/gpustat-plus.git
+cd gpustat-plus
+
+# Build the package
+./build-ubuntu-package.sh
+
+# Install the package
+sudo dpkg -i ../gpustat-plus_*.deb
+
+# Install NVIDIA dependencies (if needed)
+pip3 install nvidia-ml-py
+```
+
+See [UBUNTU-PACKAGE.md](UBUNTU-PACKAGE.md) for detailed packaging instructions.
 
 
 ### NVIDIA Driver and `pynvml` Requirements

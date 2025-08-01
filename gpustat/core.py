@@ -556,7 +556,7 @@ class GPUStatCollection(Sequence[GPUStat]):
             )
             mem_total_color = t_color.yellow
             parts.append(
-                f" | {mem_used_color}{rjustify(self.system_memory_used, 5)}{t_color.normal}"
+                f" | RAM: {mem_used_color}{rjustify(self.system_memory_used, 5)}{t_color.normal}"
             )
             parts.append(
                 f" / {mem_total_color}{rjustify(self.system_memory_total, 5)} MB{t_color.normal}"

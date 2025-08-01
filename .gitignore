@@ -7,6 +7,16 @@ dist/
 *.buildinfo
 *.changes
 
+# Debian packaging artifacts
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/gpustat-plus/
+debian/tmp/
+debian/files
+debian/gpustat-plus.*
+debian/*.log
+debian/*.substvars
+
 # Python cache
 __pycache__/
 *.pyc
