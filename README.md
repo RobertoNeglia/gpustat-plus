@@ -247,20 +247,6 @@ hostname                     Fri Aug  1 21:49:00 2025  NVIDIA Driver 535.98
 [gh-issue-133]: https://github.com/wookayin/gpustat/issues/133
 [gh-issue-161]: https://github.com/wookayin/gpustat/issues/161#issuecomment-1784007533
 
-Default display
----------------
-
-```
-[0] GeForce GTX Titan X | 77°C,  96 % | 11848 / 12287 MB | python/52046(11821M)
-```
-
-- `[0]`: GPU index (starts from 0) as PCI_BUS_ID
-- `GeForce GTX Titan X`: GPU name
-- `77°C`: GPU Temperature (in Celsius)
-- `96 %`: GPU Utilization
-- `11848 / 12287 MB`: GPU Memory Usage (Used / Total)
-- `python/...`: Running processes on GPU, owner/cmdline/PID (and their GPU memory usage)
-
 Changelog
 ---------
 
