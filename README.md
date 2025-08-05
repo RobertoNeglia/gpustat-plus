@@ -46,7 +46,6 @@ sudo apt update
 # Install required packages for building and Python dependencies
 sudo apt install -y build-essential debhelper dh-python python3-all python3-setuptools python3-setuptools-scm python3-wheel devscripts 
 
-
 # Install Python dependencies
 pip3 install setuptools_scm
 ```
