@@ -661,10 +661,10 @@ class GPUStatCollection(Sequence[GPUStat]):
                 )
                 swap_total_color = t_color.cyan
                 parts.append(
-                    f" | SWAP: {swap_used_color}{rjustify(self.system_swap_used, 4)}{t_color.normal}"
+                    f" | SWAP: {swap_used_color}{rjustify(self.system_swap_used, 5)}{t_color.normal}"
                 )
                 parts.append(
-                    f" / {swap_total_color}{rjustify(self.system_swap_total, 4)}{t_color.normal} MB"
+                    f" / {swap_total_color}{rjustify(self.system_swap_total, 5)}{t_color.normal} MB"
                 )
                 parts.append(
                     f" {swap_used_color}({rjustify(int(swap_percent), 2)}%){t_color.normal}"
