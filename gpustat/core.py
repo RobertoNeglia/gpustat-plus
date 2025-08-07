@@ -366,11 +366,20 @@ class GPUStat:
                 _write(rjustify(safe_self.power_limit, 3), " W", color="CPowL")
 
         # Memory
-        _write(" | ")
+        _write(" | VRAM: ")
         _write(rjustify(safe_self.memory_used, 5), color="CMemU")
         _write(" / ")
         _write(rjustify(safe_self.memory_total, 5), color="CMemT")
         _write(" MB")
+
+        # Add memory percentage
+        if (
+            safe_self.memory_total != "??"
+            and safe_self.memory_used != "??"
+            and safe_self.memory_total > 0
+        ):
+            memory_percent = (safe_self.memory_used / safe_self.memory_total) * 100
+            _write(f" ({int(memory_percent):2}%)", color="CMemP")
 
         # Add " |" only if processes information is to be added.
         if not no_processes:
@@ -471,6 +480,7 @@ class GPUStatCollection(Sequence[GPUStat]):
         # system-wide resource information
         self.system_cpu_percent = None
         self.system_cpu_count = None
+        self.system_cpu_temperature = None
         self.system_memory_used = None
         self.system_memory_total = None
         self.system_memory_percent = None
@@ -491,6 +501,22 @@ class GPUStatCollection(Sequence[GPUStat]):
         except Exception:
             self.system_cpu_percent = None
             self.system_cpu_count = None
+
+        try:
+            # Get CPU temperature (try to get package temperature first)
+            temps = psutil.sensors_temperatures()
+            self.system_cpu_temperature = None
+            if "coretemp" in temps and temps["coretemp"]:
+                # Look for package temperature first
+                for temp in temps["coretemp"]:
+                    if "Package id" in temp.label:
+                        self.system_cpu_temperature = temp.current
+                        break
+                # If no package temperature found, use first core temperature
+                if self.system_cpu_temperature is None and temps["coretemp"]:
+                    self.system_cpu_temperature = temps["coretemp"][0].current
+        except Exception:
+            self.system_cpu_temperature = None
 
         try:
             # Get system memory information
@@ -517,7 +543,8 @@ class GPUStatCollection(Sequence[GPUStat]):
     def _format_system_info(self, t_color, gpuname_width):
         """Format system-wide CPU, memory, and swap information for display."""
         if (
-            self.system_cpu_percent is None
+            self.system_cpu_temperature is None
+            and self.system_cpu_percent is None
             and self.system_memory_used is None
             and self.system_memory_total is None
             and self.system_swap_used is None
@@ -543,21 +570,32 @@ class GPUStatCollection(Sequence[GPUStat]):
 
         # Build system info line similar to GPU format
         parts = []
-        parts.append(f"[S] {'System':{name_width}} |")
+        # Use CPU(cores) instead of System as the name
+        if self.system_cpu_count is not None:
+            system_name = f"CPU({self.system_cpu_count})"
+        else:
+            system_name = "CPU"
+        parts.append(f"[S] {system_name:{name_width}} |")
 
-        # CPU utilization with core count info
+        # CPU temperature and utilization
+        if self.system_cpu_temperature is not None:
+            temp_color = _conditional(
+                lambda: self.system_cpu_temperature < 50, t_color.red, t_color.bold_red
+            )
+            temp_info = f"{rjustify(int(self.system_cpu_temperature), 3)}°C"
+            parts.append(f"{temp_color}{temp_info}{t_color.normal}")
+        else:
+            parts.append(f"{rjustify('??', 3)}°C")
+
+        # CPU utilization percentage
         if self.system_cpu_percent is not None:
             cpu_color = _conditional(
                 lambda: self.system_cpu_percent < 50, t_color.green, t_color.bold_green
             )
-            cpu_display = f"{rjustify(int(self.system_cpu_percent), 3)}%"
-            if self.system_cpu_count is not None:
-                cpu_info = f"CPU({self.system_cpu_count}): {cpu_color}{cpu_display}{t_color.normal}"
-            else:
-                cpu_info = f"CPU: {cpu_color}{cpu_display}{t_color.normal}"
-            parts.append(f" {cpu_info}")
+            cpu_display = f"{rjustify(int(self.system_cpu_percent), 3)} %"
+            parts.append(f", {cpu_color}{cpu_display}{t_color.normal}")
         else:
-            parts.append(f" CPU: {rjustify('??', 3)}%")
+            parts.append(f", {rjustify('??', 3)}%")
 
         # Memory usage (similar to GPU memory display)
         if self.system_memory_used is not None and self.system_memory_total is not None:
@@ -569,12 +607,14 @@ class GPUStatCollection(Sequence[GPUStat]):
             )
             mem_total_color = t_color.yellow
             parts.append(
-                f" | RAM: {mem_used_color}{rjustify(self.system_memory_used, 5)}{t_color.normal}"
+                f" | RAM: {mem_used_color}{rjustify(self.system_memory_used, 6)}{t_color.normal}"
             )
             parts.append(
-                f" / {mem_total_color}{rjustify(self.system_memory_total, 5)} MB{t_color.normal}"
+                f" / {mem_total_color}{rjustify(self.system_memory_total, 5)}{t_color.normal} MB"
             )
-            parts.append(f" ({rjustify(int(memory_percent), 2)}%)")
+            parts.append(
+                f" {mem_total_color}({rjustify(int(memory_percent), 2)}%){t_color.normal}"
+            )
         else:
             parts.append(f" | {rjustify('??', 5)} / {rjustify('??', 5)} MB")
 
@@ -593,9 +633,11 @@ class GPUStatCollection(Sequence[GPUStat]):
                     f" | SWAP: {swap_used_color}{rjustify(self.system_swap_used, 4)}{t_color.normal}"
                 )
                 parts.append(
-                    f" / {swap_total_color}{rjustify(self.system_swap_total, 4)} MB{t_color.normal}"
+                    f" / {swap_total_color}{rjustify(self.system_swap_total, 4)}{t_color.normal} MB"
                 )
-                parts.append(f" ({rjustify(int(swap_percent), 2)}%)")
+                parts.append(
+                    f" {swap_used_color}({rjustify(int(swap_percent), 2)}%){t_color.normal}"
+                )
         elif self.system_swap_used is None and self.system_swap_total is None:
             # Only add swap placeholder if we tried to collect swap but failed
             # Don't show anything if swap is disabled (total = 0)
@@ -967,6 +1009,7 @@ class GPUStatCollection(Sequence[GPUStat]):
             result["system"] = {
                 "cpu_percent": self.system_cpu_percent,
                 "cpu_count": getattr(self, "system_cpu_count", None),
+                "cpu_temperature": getattr(self, "system_cpu_temperature", None),
                 "memory_used_mb": self.system_memory_used,
                 "memory_total_mb": self.system_memory_total,
                 "memory_percent": memory_percent,
