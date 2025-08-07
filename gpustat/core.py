@@ -482,7 +482,7 @@ class GPUStatCollection(Sequence[GPUStat]):
                 del GPUStatCollection.global_processes[pid]
 
     def collect_system_info(self):
-        """Collect system-wide CPU and memory information."""
+        """Collect system-wide CPU, memory, and swap information."""
         try:
             # Get system-wide CPU usage (non-blocking call)
             self.system_cpu_percent = psutil.cpu_percent(interval=None)
@@ -503,12 +503,25 @@ class GPUStatCollection(Sequence[GPUStat]):
             self.system_memory_total = None
             self.system_memory_percent = None
 
+        try:
+            # Get system swap information
+            swap_info = psutil.swap_memory()
+            self.system_swap_used = swap_info.used // MB
+            self.system_swap_total = swap_info.total // MB
+            self.system_swap_percent = swap_info.percent
+        except Exception:
+            self.system_swap_used = None
+            self.system_swap_total = None
+            self.system_swap_percent = None
+
     def _format_system_info(self, t_color, gpuname_width):
-        """Format system-wide CPU and memory information for display."""
+        """Format system-wide CPU, memory, and swap information for display."""
         if (
             self.system_cpu_percent is None
             and self.system_memory_used is None
             and self.system_memory_total is None
+            and self.system_swap_used is None
+            and self.system_swap_total is None
         ):
             return None
 
@@ -564,6 +577,29 @@ class GPUStatCollection(Sequence[GPUStat]):
             parts.append(f" ({rjustify(int(memory_percent), 2)}%)")
         else:
             parts.append(f" | {rjustify('??', 5)} / {rjustify('??', 5)} MB")
+
+        # Swap usage (similar to memory display)
+        if self.system_swap_used is not None and self.system_swap_total is not None:
+            # Only show swap if there's actually swap space configured
+            if self.system_swap_total > 0:
+                # Calculate percentage based on the displayed MB values for consistency
+                swap_percent = (self.system_swap_used / self.system_swap_total) * 100
+
+                swap_used_color = _conditional(
+                    lambda: swap_percent < 50, t_color.bold_cyan, t_color.bold_red
+                )
+                swap_total_color = t_color.cyan
+                parts.append(
+                    f" | SWAP: {swap_used_color}{rjustify(self.system_swap_used, 4)}{t_color.normal}"
+                )
+                parts.append(
+                    f" / {swap_total_color}{rjustify(self.system_swap_total, 4)} MB{t_color.normal}"
+                )
+                parts.append(f" ({rjustify(int(swap_percent), 2)}%)")
+        elif self.system_swap_used is None and self.system_swap_total is None:
+            # Only add swap placeholder if we tried to collect swap but failed
+            # Don't show anything if swap is disabled (total = 0)
+            pass
 
         return "".join(parts)
 
@@ -904,7 +940,9 @@ class GPUStatCollection(Sequence[GPUStat]):
 
         # Add system information if available
         if hasattr(self, "system_cpu_percent") and (
-            self.system_cpu_percent is not None or self.system_memory_used is not None
+            self.system_cpu_percent is not None
+            or self.system_memory_used is not None
+            or self.system_swap_used is not None
         ):
             # Calculate memory percentage based on displayed MB values for consistency
             memory_percent = None
@@ -917,12 +955,24 @@ class GPUStatCollection(Sequence[GPUStat]):
                     self.system_memory_used / self.system_memory_total
                 ) * 100
 
+            # Calculate swap percentage
+            swap_percent = None
+            if (
+                self.system_swap_used is not None
+                and self.system_swap_total is not None
+                and self.system_swap_total > 0
+            ):
+                swap_percent = (self.system_swap_used / self.system_swap_total) * 100
+
             result["system"] = {
                 "cpu_percent": self.system_cpu_percent,
                 "cpu_count": getattr(self, "system_cpu_count", None),
                 "memory_used_mb": self.system_memory_used,
                 "memory_total_mb": self.system_memory_total,
                 "memory_percent": memory_percent,
+                "swap_used_mb": getattr(self, "system_swap_used", None),
+                "swap_total_mb": getattr(self, "system_swap_total", None),
+                "swap_percent": swap_percent,
             }
 
         return result

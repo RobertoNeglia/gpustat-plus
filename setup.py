@@ -119,10 +119,10 @@ setup(
     description="Enhanced GPU and system monitoring tool - monitor NVIDIA GPUs, CPU, and memory usage",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/wookayin/gpustat",
-    author="Jongwook Choi",
-    author_email="wookayin@gmail.com",
-    keywords="nvidia-smi gpu cpu memory system monitoring gpustat hardware resources",
+    url="https://github.com/RobertoNeglia/gpustat-plus",
+    author="Roberto Neglia",
+    author_email="robertoneglia99@gmail.com",
+    keywords="nvidia-smi gpu cpu memory system monitoring gpustat+ hardware resources",
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 5 - Production/Stable",
