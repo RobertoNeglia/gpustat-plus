@@ -506,15 +506,46 @@ class GPUStatCollection(Sequence[GPUStat]):
             # Get CPU temperature (try to get package temperature first)
             temps = psutil.sensors_temperatures()
             self.system_cpu_temperature = None
-            if "coretemp" in temps and temps["coretemp"]:
-                # Look for package temperature first
-                for temp in temps["coretemp"]:
-                    if "Package id" in temp.label:
-                        self.system_cpu_temperature = temp.current
+
+            # Try different CPU temperature sensors in order of preference
+            cpu_sensor_priorities = [
+                # Intel sensors
+                ("coretemp", ["Package id"]),  # Intel package temperature
+                ("coretemp", []),  # Intel core temperature (fallback)
+                # AMD sensors
+                ("k10temp", ["Tctl"]),  # AMD Ryzen control temperature
+                ("k10temp", ["Tccd"]),  # AMD Ryzen CCD temperature
+                ("k10temp", []),  # AMD any temperature (fallback)
+                # Generic/ASUS/other sensors
+                ("asusec", ["CPU"]),  # ASUS EC CPU temperature
+                ("acpi", ["CPU"]),  # ACPI CPU temperature
+                ("zenpower", ["Tctl"]),  # Alternative AMD driver
+                ("it87", ["temp1"]),  # IT87xx chip CPU temperature
+                ("nct6775", ["CPUTIN"]),  # Nuvoton NCT6775 CPU temperature
+            ]
+
+            for sensor_name, preferred_labels in cpu_sensor_priorities:
+                if sensor_name in temps and temps[sensor_name]:
+                    sensors = temps[sensor_name]
+
+                    # First try to find sensors with preferred labels
+                    if preferred_labels:
+                        for temp_sensor in sensors:
+                            for preferred_label in preferred_labels:
+                                if preferred_label in temp_sensor.label:
+                                    self.system_cpu_temperature = temp_sensor.current
+                                    break
+                            if self.system_cpu_temperature is not None:
+                                break
+
+                    # If no preferred label found, use the first sensor
+                    if self.system_cpu_temperature is None and sensors:
+                        self.system_cpu_temperature = sensors[0].current
+
+                    # If we found a temperature, break out of the outer loop
+                    if self.system_cpu_temperature is not None:
                         break
-                # If no package temperature found, use first core temperature
-                if self.system_cpu_temperature is None and temps["coretemp"]:
-                    self.system_cpu_temperature = temps["coretemp"][0].current
+
         except Exception:
             self.system_cpu_temperature = None
 
