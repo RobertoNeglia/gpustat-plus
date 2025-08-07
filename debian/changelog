@@ -1,3 +1,14 @@
+gpustat-plus (0.2-1) unstable; urgency=medium
+
+  * Version 0.2 release
+  * Added swap memory monitoring with color-coded display
+  * Added CPU temperature monitoring with multi-sensor support
+  * Reorganized system display to show CPU(cores) format
+  * Added GPU memory percentage display
+  * Enhanced system monitoring capabilities
+
+ -- Roberto Neglia <robertoneglia99@gmail.com>  Wed, 07 Aug 2025 12:00:00 +0000
+
 gpustat-plus (0.1.dev2+gb496fb5.d20250801-1) unstable; urgency=medium
 
   * Initial release of gpustat-plus

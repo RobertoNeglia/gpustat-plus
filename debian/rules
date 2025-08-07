@@ -10,7 +10,7 @@ export PYBUILD_NAME=gpustat-plus
 	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_auto_build:
-	GPUSTAT_VERSION="0.1.dev2+gb496fb5.d20250801" dh_auto_build
+	GPUSTAT_VERSION="0.2" dh_auto_build
 
 override_dh_auto_test:
 	# Skip tests for now as they may require GPU hardware
