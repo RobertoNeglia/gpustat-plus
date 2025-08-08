@@ -1,3 +1,10 @@
+gpustat-plus (0.2-2) unstable; urgency=medium
+
+  * Small memory display formatting fix for improved alignment
+  * Package rebuild with latest formatting improvements
+
+ -- Roberto Neglia <robertoneglia99@gmail.com>  Thu, 08 Aug 2025 12:00:00 +0000
+
 gpustat-plus (0.2-1) unstable; urgency=medium
 
   * Version 0.2 release
