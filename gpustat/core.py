@@ -367,9 +367,9 @@ class GPUStat:
 
         # Memory
         _write(" | VRAM: ")
-        _write(rjustify(safe_self.memory_used, 5), color="CMemU")
+        _write(rjustify(safe_self.memory_used, 6), color="CMemU")
         _write(" / ")
-        _write(rjustify(safe_self.memory_total, 5), color="CMemT")
+        _write(rjustify(safe_self.memory_total, 6), color="CMemT")
         _write(" MB")
 
         # Add memory percentage
@@ -638,10 +638,10 @@ class GPUStatCollection(Sequence[GPUStat]):
             )
             mem_total_color = t_color.yellow
             parts.append(
-                f" | RAM: {mem_used_color}{rjustify(self.system_memory_used, 6)}{t_color.normal}"
+                f" | RAM: {mem_used_color}{rjustify(self.system_memory_used, 7)}{t_color.normal}"
             )
             parts.append(
-                f" / {mem_total_color}{rjustify(self.system_memory_total, 5)}{t_color.normal} MB"
+                f" / {mem_total_color}{rjustify(self.system_memory_total, 6)}{t_color.normal} MB"
             )
             parts.append(
                 f" {mem_total_color}({rjustify(int(memory_percent), 2)}%){t_color.normal}"
